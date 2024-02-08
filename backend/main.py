@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from sqlalchemy import create_engine
 from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
 
 DATABASE_URL="mysql+mysqldb://root:@localhost/carbon_footprint?charset=utf8mb4"
 
@@ -89,6 +90,19 @@ class Water(BaseModel):
     total: float
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:3002",
+    "http://localhost:8000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 def startup():
