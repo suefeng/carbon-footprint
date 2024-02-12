@@ -1,7 +1,5 @@
-"use client";
-
-import { SetStateAction, useState } from "react";
-import DataTable from "@/components/DataTable";
+import React, { useEffect, SetStateAction, useState } from "react";
+import { DataTable } from "@/components/DataTable";
 import { GridColDef } from "@mui/x-data-grid";
 import { WaterType } from "@/domain/entities/water";
 import {
@@ -29,20 +27,28 @@ const columns: GridColDef[] = [
 const formattedWaterData = async (
   setRowsWaterData: React.Dispatch<SetStateAction<WaterType[]>>
 ) => {
-  const data: WaterType[] = await getData("water");
-  setRowsWaterData(data);
+  if (!localStorage.getItem("water")) {
+    const data: WaterType[] = await getData("water");
+    localStorage.setItem("water", JSON.stringify(data));
+    setRowsWaterData(data);
+  } else {
+    const data: WaterType[] = JSON.parse(localStorage.getItem("water")!);
+    setRowsWaterData(data);
+  }
 };
 
 export const WaterTable = () => {
   const [rowsWaterData, setRowsWaterData] = useState<WaterType[]>([]);
 
-  rowsWaterData.length > 0
-    ? rowsWaterData
-    : formattedWaterData(setRowsWaterData);
+  useEffect(() => {
+    if (!rowsWaterData.length) {
+      formattedWaterData(setRowsWaterData);
+    }
+  }, [rowsWaterData]);
 
   return (
     <>
-      {rowsWaterData && (
+      {rowsWaterData.length > 0 && (
         <DataTable rows={rowsWaterData} columns={columns} perPage={6} />
       )}
     </>

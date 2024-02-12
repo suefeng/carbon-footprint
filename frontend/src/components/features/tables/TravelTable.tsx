@@ -1,14 +1,10 @@
 "use client";
 
-import { SetStateAction, useState } from "react";
-import DataTable from "@/components/DataTable";
+import React, { SetStateAction, useEffect, useState } from "react";
+import { DataTable } from "@/components/DataTable";
 import { GridColDef } from "@mui/x-data-grid";
 import { TravelType } from "@/domain/entities/travel";
-import {
-  formattedDate,
-  formattedPrice,
-  getData,
-} from "@/infrastructure/utilities";
+import { formattedDate, getData } from "@/infrastructure/utilities";
 
 const columns: GridColDef[] = [
   { field: "type", headerName: "Type", width: 120 },
@@ -38,22 +34,30 @@ const columns: GridColDef[] = [
 const formattedTravelData = async (
   setRowsTravelData: React.Dispatch<SetStateAction<TravelType[]>>
 ) => {
-  const data: TravelType[] = await getData("travel");
-  setRowsTravelData(data);
+  if (!localStorage.getItem("travel")) {
+    const data: TravelType[] = await getData("travel");
+    localStorage.setItem("travel", JSON.stringify(data));
+    setRowsTravelData(data);
+  } else {
+    const data: TravelType[] = JSON.parse(localStorage.getItem("travel")!);
+    setRowsTravelData(data);
+  }
 };
 
-export default function TravelTable() {
+export const TravelTable = () => {
   const [rowsTravelData, setRowsTravelData] = useState<TravelType[]>([]);
 
-  rowsTravelData.length > 0
-    ? rowsTravelData
-    : formattedTravelData(setRowsTravelData);
+  useEffect(() => {
+    if (!rowsTravelData.length) {
+      formattedTravelData(setRowsTravelData);
+    }
+  }, [rowsTravelData]);
 
   return (
     <>
-      {rowsTravelData && (
+      {rowsTravelData.length > 0 && (
         <DataTable rows={rowsTravelData} columns={columns} perPage={50} />
       )}
     </>
   );
-}
+};

@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from sqlalchemy import create_engine
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+import consts
 
 DATABASE_URL="mysql+mysqldb://root:@localhost/carbon_footprint?charset=utf8mb4"
 
@@ -58,6 +59,14 @@ water = sqlalchemy.Table(
     sqlalchemy.Column("total", sqlalchemy.Float),
 )
 
+ffp = sqlalchemy.Table(
+    "fossil_fuel_percentage",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("year", sqlalchemy.Integer),
+    sqlalchemy.Column("percentage", sqlalchemy.Integer),
+)
+
 
 metadata.create_all(engine)
 
@@ -67,6 +76,7 @@ class Electricity(BaseModel):
     kwh: int
     low: int
     high: int
+    kgco2: float
 
 
 class NaturalGas(BaseModel):
@@ -74,6 +84,7 @@ class NaturalGas(BaseModel):
     month: str
     therms: int
     average_temperature: int
+    kgco2: float
 
 class Travel(BaseModel):
     id: int
@@ -89,10 +100,15 @@ class Water(BaseModel):
     date_paid: str
     total: float
 
+class FFP(BaseModel):
+    id: int
+    year: int
+    percentage: int
+
 app = FastAPI()
 
 origins = [
-    "http://localhost:3002",
+    "http://localhost:3001",
     "http://localhost:8000",
 ]
 
@@ -127,7 +143,17 @@ def read_electricity():
         result = conn.execute(query)
         json_body = []
         for row in result:
-            json_body.append(jsonable_encoder(row))
+            year = int(row.date.strftime("%Y"))
+            percentage = conn.execute(f"SELECT percentage FROM fossil_fuel_percentage where year = {year}").first()[0]
+            json_row = {
+                "id": row.id,
+                "date": row.date.strftime("%Y-%m-%d"),
+                "kwh": row.kwh,
+                "low": row.low,
+                "high": row.high,
+                "kgco2": consts.KG_KWH(row.kwh, percentage)
+            }
+            json_body.append(json_row)
         return json_body
     
 @app.get(API_ROOT + "/natural-gas/", response_model=List[NaturalGas])
@@ -137,7 +163,14 @@ def read_natural_gas():
         result = conn.execute(query)
         json_body = []
         for row in result:
-            json_body.append(jsonable_encoder(row))
+            json_row = {
+                "id": row.id,
+                "month": row.month,
+                "therms": row.therms,
+                "average_temperature": row.average_temperature,
+                "kgco2": consts.KG_THERM(row.therms)
+            }
+            json_body.append(json_row)
         return json_body
     
 @app.get(API_ROOT + "/travel/", response_model=List[Travel])
@@ -153,6 +186,16 @@ def read_travel():
 @app.get(API_ROOT + "/water/", response_model=List[Water])
 def read_water():
     query = water.select()
+    with engine.connect() as conn:
+        result = conn.execute(query)
+        json_body = []
+        for row in result:
+            json_body.append(jsonable_encoder(row))
+        return json_body
+    
+@app.get(API_ROOT + "/ffp/", response_model=List[FFP])
+def read_ffp():
+    query = ffp.select()
     with engine.connect() as conn:
         result = conn.execute(query)
         json_body = []

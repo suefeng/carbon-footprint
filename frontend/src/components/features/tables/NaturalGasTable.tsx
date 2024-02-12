@@ -1,12 +1,13 @@
 "use client";
 
-import { SetStateAction, useState } from "react";
-import DataTable from "@/components/DataTable";
+import React, { SetStateAction, useEffect, useState } from "react";
+import { DataTable } from "@/components/DataTable";
 import { GridColDef } from "@mui/x-data-grid";
 import { NaturalGasType } from "@/domain/entities/naturalGas";
 import { getData } from "@/infrastructure/utilities";
 
 const columns: GridColDef[] = [
+  { field: "kgco2", headerName: "Kg CO2", width: 120 },
   { field: "month", headerName: "Month", width: 200 },
   {
     field: "therms",
@@ -23,8 +24,16 @@ const columns: GridColDef[] = [
 const formattedNaturalGasData = async (
   setRowsNaturalGasData: React.Dispatch<SetStateAction<NaturalGasType[]>>
 ) => {
-  const data: NaturalGasType[] = await getData("natural-gas");
-  setRowsNaturalGasData(data);
+  if (!localStorage.getItem("natural-gas")) {
+    const data: NaturalGasType[] = await getData("natural-gas");
+    localStorage.setItem("natural-gas", JSON.stringify(data));
+    setRowsNaturalGasData(data);
+  } else {
+    const data: NaturalGasType[] = JSON.parse(
+      localStorage.getItem("natural-gas")!
+    );
+    setRowsNaturalGasData(data);
+  }
 };
 
 export const NaturalGasTable = () => {
@@ -32,13 +41,15 @@ export const NaturalGasTable = () => {
     NaturalGasType[]
   >([]);
 
-  rowsNaturalGasData.length > 0
-    ? rowsNaturalGasData
-    : formattedNaturalGasData(setRowsNaturalGasData);
+  useEffect(() => {
+    if (!rowsNaturalGasData.length) {
+      formattedNaturalGasData(setRowsNaturalGasData);
+    }
+  }, [rowsNaturalGasData]);
 
   return (
     <>
-      {rowsNaturalGasData && (
+      {rowsNaturalGasData.length > 0 && (
         <DataTable rows={rowsNaturalGasData} columns={columns} perPage={12} />
       )}
     </>
