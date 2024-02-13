@@ -4,3 +4,5 @@
 .my.cnf
 
 __pycache__
+
+.env
