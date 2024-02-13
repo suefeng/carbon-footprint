@@ -16,7 +16,7 @@ export const formattedPrice = (price: number) => {
 };
 
 export async function getData(dataCategory: string) {
-  const response = await fetch(`http://localhost:8000/api/v1/${dataCategory}`);
+  const response = await fetch(`http://localhost:8000/api/v1/${dataCategory}/`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch data");
@@ -44,12 +44,14 @@ export function groupBy<T, K>(
 
 export const getYear = (date: string) => new Date(date).getFullYear();
 
-export function sumKgCO2PerYear(items: ElectricityType[]) {
-  const kgco2 = items.map((item) => item.kgco2);
+export function sumTonsCo2PerYear(items: any[]) {
+  const tons_co2 = items.map((item) => item.tons_co2);
   const data = {
-    year: getYear(items[0].date),
-    kgco2: Number(
-      items.reduce((acc, curr) => acc + Number(curr.kgco2), 0).toFixed(2)
+    year: items[0].date
+      ? getYear(items[0].date)
+      : Number(items[0].month.split(" ")[1]),
+    tons_co2: Number(
+      items.reduce((acc, curr) => acc + Number(curr.tons_co2), 0).toFixed(2)
     ),
   };
   return data;

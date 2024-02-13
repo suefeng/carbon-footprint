@@ -4,5 +4,5 @@ export interface ElectricityType {
   kwh: number;
   low: number;
   high: number;
-  kgco2: number;
+  tons_co2: number;
 }

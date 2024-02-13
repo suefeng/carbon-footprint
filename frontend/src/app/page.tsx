@@ -44,7 +44,7 @@ export default function Home() {
             >
               <Tab label="Water" {...a11yProps(0)} />
               <Tab label="Electricity" {...a11yProps(1)} />
-              <Tab label="NaturalGas" {...a11yProps(2)} />
+              <Tab label="Natural Gas" {...a11yProps(2)} />
               <Tab label="Travel" {...a11yProps(3)} />
             </Tabs>
           </Box>

@@ -3,5 +3,5 @@ export interface NaturalGasType {
   month: string;
   therms: number;
   average_temperature: number;
-  kgco2: number;
+  tons_co2: number;
 }
