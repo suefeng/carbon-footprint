@@ -3,6 +3,7 @@ import connection
 from pydantic import BaseModel
 from typing import List
 import utilities as utilities
+from sqlalchemy import select
 
 electricity = sqlalchemy.Table(
     "electricity",
@@ -22,6 +23,19 @@ class Electricity(BaseModel):
     high: int
     tons_co2: float
 
+fossil_fuel_percentage = sqlalchemy.Table(
+    "fossil_fuel_percentage",
+    connection.metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("year", sqlalchemy.Integer),
+    sqlalchemy.Column("percentage", sqlalchemy.Integer),
+)
+
+class FossilFuelPercentage(BaseModel):
+    id: int
+    year: int
+    percentage: int
+
 app = connection.app
 @app.get(connection.API_ROOT + "/electricity/", response_model=List[Electricity])
 def read_electricity():
@@ -31,7 +45,8 @@ def read_electricity():
         json_body = []
         for row in result:
             year = int(row.date.strftime("%Y"))
-            percentage = conn.execute(f"SELECT percentage FROM fossil_fuel_percentage where year = {year}").first()[0]
+            percentage_query = select(fossil_fuel_percentage.c.percentage).where(fossil_fuel_percentage.c.year == year)
+            percentage = conn.execute(percentage_query).first()[0]
             json_row = {
                 "id": row.id,
                 "date": row.date.strftime("%Y-%m-%d"),

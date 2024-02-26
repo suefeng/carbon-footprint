@@ -35,7 +35,7 @@ def startup():
 
 @app.on_event("shutdown")
 def shutdown():
-    engine.disconnect()
+    engine.dispose()
 
 # routes
     
