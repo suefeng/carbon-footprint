@@ -2,12 +2,13 @@
 
 ## Setting up the backend
 
-The backend uses `pipenv 2023.12.1` for package management. Make sure you have that before you begin. It also requires MySQL.
+The backend uses `pipenv 2023.12.1` for package management. Make sure you have that before you begin. It also requires MySQL, so make sure you have that.
 
 ### Setting up MySQL
 
-1. Create a database called `carbon_footprint`
-2. Import the `carbon_footprint_initialize.sql` file.
+1. If you don't have MySQL, run `brew install mysql`.
+2. Create the database and tables by running `mysql -u root -p < carbon_footprint_initialize.sql`.
+3. Create a `.env` file and add `DATABASE_URL="mysql+mysqldb://root:@localhost/carbon_footprint?charset=utf8mb4"` as the database url.
 
 ### Installing the packages and running the API
 
@@ -19,6 +20,8 @@ The backend uses `pipenv 2023.12.1` for package management. Make sure you have t
 ## Setting up the frontend
 
 The frontend uses `node 18.17.1` for package management. Make sure you have that before you begin.
+
+It uses Next.js app routes for the framework and Material UI `DataGrid` and `GridToolbar` for displaying the data.
 
 ### Installing the packages and running the app
 
