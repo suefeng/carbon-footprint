@@ -2,6 +2,7 @@
 
 import { useState, SyntheticEvent } from "react";
 import Nav from "@/components/Nav";
+import { AllTable } from "@/components/features/tables/AllTable";
 import { ElectricityTable } from "@/components/features/tables/ElectricityTable";
 import { WaterTable } from "@/components/features/tables/WaterTable";
 import { NaturalGasTable } from "@/components/features/tables/NaturalGasTable";
@@ -42,22 +43,26 @@ export default function Home() {
               onChange={handleChange}
               aria-label="tabs for the carbon footprint categories"
             >
-              <Tab label="Water" {...a11yProps(0)} />
-              <Tab label="Electricity" {...a11yProps(1)} />
-              <Tab label="Natural Gas" {...a11yProps(2)} />
-              <Tab label="Travel" {...a11yProps(3)} />
+              <Tab label="All" {...a11yProps(0)} />
+              <Tab label="Water" {...a11yProps(1)} />
+              <Tab label="Electricity" {...a11yProps(2)} />
+              <Tab label="Natural Gas" {...a11yProps(3)} />
+              <Tab label="Travel" {...a11yProps(4)} />
             </Tabs>
           </Box>
           <TabPanel value={tabValue} index={0}>
-            <WaterTable />
+            <AllTable />
           </TabPanel>
           <TabPanel value={tabValue} index={1}>
-            <ElectricityTable />
+            <WaterTable />
           </TabPanel>
           <TabPanel value={tabValue} index={2}>
-            <NaturalGasTable />
+            <ElectricityTable />
           </TabPanel>
           <TabPanel value={tabValue} index={3}>
+            <NaturalGasTable />
+          </TabPanel>
+          <TabPanel value={tabValue} index={4}>
             <TravelTable />
           </TabPanel>
         </div>

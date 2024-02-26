@@ -7,7 +7,10 @@ interface DataTableProps {
 }
 
 export const DataTable = ({ rows, columns, perPage = 50 }: DataTableProps) => (
-  <div className="max-w-100" style={{ maxHeight: 800 }}>
+  <div
+    className="max-w-100 bg-white dark:bg-slate-900"
+    style={{ maxHeight: 800 }}
+  >
     <DataGrid
       rows={rows}
       columns={columns}
@@ -17,6 +20,9 @@ export const DataTable = ({ rows, columns, perPage = 50 }: DataTableProps) => (
         },
       }}
       slots={{ toolbar: GridToolbar }}
+      getRowClassName={(params) =>
+        params.indexRelativeToCurrentPage % 2 === 0 ? "bg-slate-100" : ""
+      }
     />
   </div>
 );

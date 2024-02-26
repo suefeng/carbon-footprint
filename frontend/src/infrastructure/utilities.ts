@@ -1,5 +1,3 @@
-import { ElectricityType } from "@/domain/entities/electricity";
-
 export const formattedDate = (date: string) => {
   return new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
@@ -42,14 +40,23 @@ export function groupBy<T, K>(
   return map;
 }
 
-export const getYear = (date: string) => new Date(date).getFullYear();
+export const getYear = (date: string) => Number(new Date(date).getFullYear());
+
+const conditionalGetYear = (items: any) => {
+  if (items[0].date) {
+    return getYear(items[0].date);
+  } else if (items[0].month) {
+    return Number(items[0].month.split(" ")[1]);
+  } else if (items[0].date_paid) {
+    return getYear(items[0].date_paid);
+  } else {
+    return getYear(items[0].year);
+  }
+};
 
 export function sumTonsCo2PerYear(items: any[]) {
-  const tons_co2 = items.map((item) => item.tons_co2);
   const data = {
-    year: items[0].date
-      ? getYear(items[0].date)
-      : Number(items[0].month.split(" ")[1]),
+    year: conditionalGetYear(items),
     tons_co2: Number(
       items.reduce((acc, curr) => acc + Number(curr.tons_co2), 0).toFixed(2)
     ),

@@ -3,4 +3,5 @@ export interface WaterType {
   cons: number;
   date_paid: string;
   total: number;
+  tons_co2: number;
 }

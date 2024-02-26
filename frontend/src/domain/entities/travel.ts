@@ -5,4 +5,5 @@ export interface TravelType {
   location: string;
   time?: string;
   miles: number;
+  tons_co2: number;
 }
