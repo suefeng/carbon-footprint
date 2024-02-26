@@ -3,7 +3,7 @@ import connection
 from pydantic import BaseModel
 from typing import List
 from fastapi.encoders import jsonable_encoder
-import consts
+import utilities as utilities
 
 natural_gas = sqlalchemy.Table(
     "natural_gas",
@@ -34,7 +34,7 @@ def read_natural_gas():
                 "month": row.month,
                 "therms": row.therms,
                 "average_temperature": row.average_temperature,
-                "tons_co2": consts.TONS_THERM(row.therms)
+                "tons_co2": utilities.tons_therm(row.therms)
             }
             json_body.append(json_row)
         return json_body

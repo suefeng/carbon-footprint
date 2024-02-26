@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import List
 from fastapi.encoders import jsonable_encoder
 from typing import Optional
+import utilities
 
 travel = sqlalchemy.Table(
     "travel",
@@ -23,14 +24,25 @@ class Travel(BaseModel):
     location: str
     time: Optional[str] = None
     miles: int
+    tons_co2: float
 
 app = connection.app
 @app.get(connection.API_ROOT + "/travel/", response_model=List[Travel])
+
 def read_travel():
     query = travel.select()
     with connection.engine.connect() as conn:
         result = conn.execute(query)
         json_body = []
         for row in result:
-            json_body.append(jsonable_encoder(row))
+            json_row = {
+                "id": row.id,
+                "type": row.type,
+                "date": row.date.strftime("%Y-%m-%d"),
+                "location": row.location,
+                "time": row.time,
+                "miles": row.miles,
+                "tons_co2": utilities.tons_co2(float(row.miles), row.type)
+            }
+            json_body.append(json_row)
         return json_body

@@ -3,6 +3,7 @@ import connection
 from pydantic import BaseModel
 from typing import List
 from fastapi.encoders import jsonable_encoder
+import utilities
 
 water = sqlalchemy.Table(
     "water",
@@ -18,6 +19,7 @@ class Water(BaseModel):
     cons: int
     date_paid: str
     total: float
+    tons_co2: float
 
 app = connection.app
 @app.get(connection.API_ROOT + "/water/", response_model=List[Water])
@@ -27,5 +29,12 @@ def read_water():
         result = conn.execute(query)
         json_body = []
         for row in result:
-            json_body.append(jsonable_encoder(row))
+            json_row = {
+                "id": row.id,
+                "cons": row.cons,
+                "date_paid": row.date_paid.strftime("%Y-%m-%d"),
+                "total": row.total,
+                "tons_co2": utilities.tons_water(row.cons)
+            }
+            json_body.append(json_row)
         return json_body

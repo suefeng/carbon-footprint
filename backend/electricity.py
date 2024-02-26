@@ -2,7 +2,7 @@ import sqlalchemy
 import connection
 from pydantic import BaseModel
 from typing import List
-import consts
+import utilities as utilities
 
 electricity = sqlalchemy.Table(
     "electricity",
@@ -38,7 +38,7 @@ def read_electricity():
                 "kwh": row.kwh,
                 "low": row.low,
                 "high": row.high,
-                "tons_co2": consts.TONS_KWH(row.kwh, percentage)
+                "tons_co2": utilities.tons_kwh(row.kwh, percentage)
             }
             json_body.append(json_row)
         return json_body
