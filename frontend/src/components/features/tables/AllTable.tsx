@@ -82,11 +82,15 @@ export const AllTable = () => {
           total: waterCo2 + electricityCo2 + naturalGasCo2 + travelCo2,
         };
       });
-      localStorage.setItem("all", JSON.stringify(data));
-      setRowsAllData(data);
+      if (data.length > 0) {
+        localStorage.setItem("all", JSON.stringify(data));
+        setRowsAllData(data);
+      }
     } else {
       const data: AllType[] = JSON.parse(localStorage.getItem("all")!);
-      setRowsAllData(data);
+      if (data.length > 0) {
+        setRowsAllData(data);
+      }
     }
   };
 
